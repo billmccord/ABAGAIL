@@ -39,6 +39,9 @@ public class AbaloneTest {
     private static DecimalFormat df = new DecimalFormat("0.000");
 
     public static void main(String[] args) {
+        System.out.println(set);
+        System.out.println(new DataSetDescription(set));
+
         for(int i = 0; i < oa.length; i++) {
             networks[i] = factory.createClassificationNetwork(
                 new int[] {inputLayer, hiddenLayer, outputLayer});

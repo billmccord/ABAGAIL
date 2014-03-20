@@ -5,18 +5,18 @@ package shared;
  * @author Andrew Guillory gtg008g@mail.gatech.edu
  * @version 1.0
  */
-public class FixedIterationTrainer implements Trainer {
-    
+public class FixedIterationTrainer implements IterationTrainer {
+
     /**
      * The inner trainer
      */
     private Trainer trainer;
-    
+
     /**
      * The number of iterations to train
      */
     private int iterations;
-    
+
     /**
      * Make a new fixed iterations trainer
      * @param t the trainer
@@ -37,6 +37,9 @@ public class FixedIterationTrainer implements Trainer {
         }
         return sum / iterations;
     }
-    
 
+    @Override
+    public int getIterations() {
+        return iterations;
+    }
 }

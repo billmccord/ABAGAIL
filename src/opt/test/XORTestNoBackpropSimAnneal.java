@@ -7,6 +7,7 @@ import opt.RandomizedHillClimbing;
 import opt.SimulatedAnnealing;
 import opt.example.NeuralNetworkOptimizationProblem;
 import shared.*;
+import shared.tester.*;
 
 /**
  * Based on the XORTest test class, this class uses a standard FeedForwardNetwork
@@ -27,11 +28,12 @@ public class XORTestNoBackpropSimAnneal {
     public static void main(String[] args) {
         // 1) Construct data instances for training.  These will also be run
         //    through the network at the bottom to verify the output
+        int[] labels = { 0, 1 };
         double[][][] data = {
-               { { 1, 1, 1, 1 }, { 0 } },
-               { { 1, 0, 1, 0 }, { 1 } },
-               { { 0, 1, 0, 1 }, { 1 } },
-               { { 0, 0, 0, 0 }, { 0 } }
+               { { 1, 1, 1, 1 }, { labels[0] } },
+               { { 1, 0, 1, 0 }, { labels[1] } },
+               { { 0, 1, 0, 1 }, { labels[1] } },
+               { { 0, 0, 0, 0 }, { labels[0] } }
         };
         Instance[] patterns = new Instance[data.length];
         for (int i = 0; i < patterns.length; i++) {
@@ -84,5 +86,15 @@ public class XORTestNoBackpropSimAnneal {
             System.out.println(patterns[i].getLabel());
             System.out.println(network.getOutputValues());
         }
+
+        //11) Run the training data through the network with the weights discovered through optimization, and
+        //    print out the expected label and result of the classifier for each instance.
+        TestMetric acc = new AccuracyTestMetric();
+        TestMetric cm  = new ConfusionMatrixTestMetric(labels);
+        Tester t = new NeuralNetworkTester(network, acc, cm);
+        t.test(patterns);
+
+        acc.printResults();
+        cm.printResults();
     }
 }

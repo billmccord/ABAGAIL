@@ -35,10 +35,7 @@ public class MIMIC extends OptimizationAlgorithm {
     /**
      * Make a new mimic
      * @param samples the number of samples to take each iteration
-     * @param random how many of those samples should be completely random
-     * @param theta the starting theta
-     * @param increment the increment
-     * @param stoppingCount the minimum number of good samples needed to continue
+     * @param tokeep the number of samples to keep on each iteration.
      * @param op the problem
      */
     public MIMIC(int samples, int tokeep, ProbabilisticOptimizationProblem op) {

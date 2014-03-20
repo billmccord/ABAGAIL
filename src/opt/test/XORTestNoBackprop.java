@@ -83,8 +83,18 @@ public class XORTestNoBackprop {
         //    optimal weights found for this network.
         Instance opt = o.getOptimal();
         network.setWeights(opt.getData());
-        
+
         //10) Run the training data through the network with the weights discovered through optimization, and
+        //    print out the expected label and result of the classifier for each instance.
+        for (int i = 0; i < patterns.length; i++) {
+            network.setInputValues(patterns[i].getData());
+            network.run();
+            System.out.println("~~");
+            System.out.println(patterns[i].getLabel());
+            System.out.println(network.getOutputValues());
+        }
+        
+        //11) Run the training data through the network with the weights discovered through optimization, and
         //    print out the expected label and result of the classifier for each instance.
         TestMetric acc = new AccuracyTestMetric();
         TestMetric cm  = new ConfusionMatrixTestMetric(labels);

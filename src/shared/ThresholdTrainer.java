@@ -5,7 +5,7 @@ package shared;
  * @author Andrew Guillory gtg008g@mail.gatech.edu
  * @version 1.0
  */
-public class ThresholdTrainer implements Trainer { 
+public class ThresholdTrainer implements IterationTrainer {
     /** The default threshold */
     private static final double THRESHOLD = 1E-6;
     /** The maxium number of iterations */
@@ -70,9 +70,8 @@ public class ThresholdTrainer implements Trainer {
      * Get the number of iterations used
      * @return the number of iterations
      */
+    @Override
     public int getIterations() {
         return iterations;
     }
-    
-
 }

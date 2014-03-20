@@ -39,6 +39,8 @@ public class TravelingSalesmanTest {
      * @param args ignored
      */
     public static void main(String[] args) {
+        System.out.println("Number of cities: " + N);
+
         Random random = new Random();
         // create the random points
         double[][] points = new double[N][2];

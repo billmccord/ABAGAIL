@@ -33,7 +33,7 @@ import shared.FixedIterationTrainer;
  */
 public class CountOnesTest {
     /** The n value */
-    private static final int N = 80;
+    private static final int N = 1000;
     
     public static void main(String[] args) {
         int[] ranges = new int[N];
@@ -48,7 +48,7 @@ public class CountOnesTest {
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         
-        RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
+        RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200);
         fit.train();
         System.out.println(ef.value(rhc.getOptimal()));
