@@ -37,25 +37,25 @@ public class KnapsackTestRunner extends OptimizationTestRunner {
     private KnapsackEvaluationFunction evaluationFunction;
 
     public static class Builder {
-        private KnapsackTestRunner knapsackVaryItemsTest;
+        private KnapsackTestRunner knapsackTestRunner;
 
         public Builder() {
-            this.knapsackVaryItemsTest = new KnapsackTestRunner();
+            this.knapsackTestRunner = new KnapsackTestRunner();
         }
 
         public Builder setCopiesEach(int copiesEach) {
-            knapsackVaryItemsTest.copiesEach = copiesEach;
+            knapsackTestRunner.copiesEach = copiesEach;
             return this;
         }
 
         public Builder setNumItems(int numItems) {
-            knapsackVaryItemsTest.numItems = numItems;
+            knapsackTestRunner.numItems = numItems;
             return this;
         }
 
         public KnapsackTestRunner build() {
-            knapsackVaryItemsTest.generateEvaluationFunction();
-            return knapsackVaryItemsTest;
+            knapsackTestRunner.generateEvaluationFunction();
+            return knapsackTestRunner;
         }
     }
 

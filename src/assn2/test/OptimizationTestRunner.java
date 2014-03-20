@@ -18,9 +18,9 @@ public abstract class OptimizationTestRunner implements CsvWriteable {
 
     private static final String[] FIELDS = {
             "Algorithm",
-            "NumIterations",
+            "Iterations",
             "Runtime",
-            "OptimalScore"
+            "Score"
     };
 
     private SimpleStopWatch stopwatch = new SimpleStopWatch();

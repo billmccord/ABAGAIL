@@ -23,25 +23,25 @@ public class FourPeaksTestRunner extends OptimizationTestRunner {
     private FourPeaksEvaluationFunction evaluationFunction;
 
     public static class Builder {
-        private FourPeaksTestRunner knapsackVaryItemsTest;
+        private FourPeaksTestRunner fourPeaksTestRunner;
 
         public Builder() {
-            this.knapsackVaryItemsTest = new FourPeaksTestRunner();
+            this.fourPeaksTestRunner = new FourPeaksTestRunner();
         }
 
         public Builder setN(int n) {
-            knapsackVaryItemsTest.n = n;
+            fourPeaksTestRunner.n = n;
             return this;
         }
 
         public Builder setT(int t) {
-            knapsackVaryItemsTest.t = t;
+            fourPeaksTestRunner.t = t;
             return this;
         }
 
         public FourPeaksTestRunner build() {
-            knapsackVaryItemsTest.generateEvaluationFunction();
-            return knapsackVaryItemsTest;
+            fourPeaksTestRunner.generateEvaluationFunction();
+            return fourPeaksTestRunner;
         }
     }
 
