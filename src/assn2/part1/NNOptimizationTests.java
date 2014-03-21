@@ -1,5 +1,6 @@
 package assn2.part1;
 
+import assn2.util.DataSetUtil;
 import func.nn.backprop.BackPropagationNetwork;
 import func.nn.backprop.BackPropagationNetworkFactory;
 import opt.OptimizationAlgorithm;
@@ -7,9 +8,10 @@ import opt.RandomizedHillClimbing;
 import opt.SimulatedAnnealing;
 import opt.example.NeuralNetworkOptimizationProblem;
 import opt.ga.StandardGeneticAlgorithm;
-import shared.*;
-import shared.filt.LabelSplitFilter;
-import shared.reader.ArffDataSetReader;
+import shared.DataSet;
+import shared.ErrorMeasure;
+import shared.Instance;
+import shared.SumOfSquaresError;
 import shared.writer.CSVWriter;
 
 import java.io.IOException;
@@ -23,17 +25,9 @@ import java.text.DecimalFormat;
  * @version 1.0
  */
 public class NNOptimizationTests {
-    private static final String DIR_PREFIX = "src/assn2/data/";
-
-    private static final String DATA_FILE_TEMPLATE = DIR_PREFIX + "%s/nursery-%s.arff";
-
-    private static final String TRAINING_FILE = String.format(DATA_FILE_TEMPLATE, "training", "training");
-
-    private static final String TEST_FILE = String.format(DATA_FILE_TEMPLATE, "test", "test");
-
-    private static DataSet trainingSet = readTrainingDataSet();
+    private static DataSet trainingSet = DataSetUtil.readNurseryTrainingDataSet();
     private static Instance[] trainingInstances = trainingSet.getInstances();
-    private static DataSet testSet = readTestDataSet();
+    private static DataSet testSet = DataSetUtil.readNurseryTestDataSet();
     private static Instance[] testInstances = testSet.getInstances();
 
     private static final int outputLayer = 1;
@@ -115,14 +109,18 @@ public class NNOptimizationTests {
 
             double predicted, actual;
             start = System.nanoTime();
-            for(int j = 0; j < testInstances.length; j++) {
-                networks[i].setInputValues(testInstances[j].getData());
+            for(Instance testInstance : testInstances) {
+                networks[i].setInputValues(testInstance.getData());
                 networks[i].run();
 
-                predicted = Double.parseDouble(testInstances[j].getLabel().toString());
+                predicted = Double.parseDouble(testInstance.getLabel().toString());
                 actual = Double.parseDouble(networks[i].getOutputValues().toString());
 
-                double trash = Math.abs(predicted - actual) < 0.5 ? correct++ : incorrect++;
+                if (Math.abs(predicted - actual) < 0.5) {
+                    correct++;
+                } else {
+                    incorrect++;
+                }
             }
             end = System.nanoTime();
             testingTime = end - start;
@@ -160,11 +158,11 @@ public class NNOptimizationTests {
             oa.train();
 
             double error = 0;
-            for(int j = 0; j < trainingInstances.length; j++) {
-                network.setInputValues(trainingInstances[j].getData());
+            for(Instance trainingInstance : trainingInstances) {
+                network.setInputValues(trainingInstance.getData());
                 network.run();
 
-                Instance output = trainingInstances[j].getLabel(), example = new Instance(network.getOutputValues());
+                Instance output = trainingInstance.getLabel(), example = new Instance(network.getOutputValues());
                 example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
                 error += measure.value(output, example);
             }
@@ -173,37 +171,5 @@ public class NNOptimizationTests {
 
             System.out.println("Training iteration: " + i + " error: " + df.format(error) + " average error: " + df.format(averageError));
         }
-    }
-
-    private static DataSet readTrainingDataSet() {
-        return readDataSet(TRAINING_FILE);
-    }
-
-    private static DataSet readTestDataSet() {
-        return readDataSet(TEST_FILE);
-    }
-
-    private static DataSet readDataSet(String fileName) {
-        ArffDataSetReader reader = new ArffDataSetReader(fileName);
-        DataSet ds;
-        try {
-            ds = reader.read();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        LabelSplitFilter lsf = new LabelSplitFilter();
-        lsf.filter(ds);
-
-        // Try to classify if the person was recommended or not.
-        for(Instance instance : ds) {
-            instance.setLabel(new Instance(instance.getLabel().getDiscrete() == 0 ? 0 : 1));
-        }
-
-        System.out.println(ds);
-        System.out.println(new DataSetDescription(ds));
-
-        return ds;
     }
 }

@@ -1,36 +1,28 @@
 package assn2.part1;
 
+import assn2.util.DataSetUtil;
 import func.nn.backprop.BackPropagationNetwork;
 import func.nn.backprop.BackPropagationNetworkFactory;
 import func.nn.backprop.BatchBackPropagationTrainer;
 import func.nn.backprop.RPROPUpdateRule;
-import shared.*;
-import shared.filt.LabelSplitFilter;
-import shared.reader.ArffDataSetReader;
+import shared.ConvergenceTrainer;
+import shared.DataSet;
+import shared.Instance;
+import shared.SumOfSquaresError;
 import shared.writer.CSVWriter;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 
 public class NNClassificationTest {
-    private static final String DIR_PREFIX = "src/assn2/data/";
-
-    private static final String DATA_FILE_TEMPLATE = DIR_PREFIX + "%s/nursery-%s.arff";
-
-    private static final String TRAINING_FILE = String.format(DATA_FILE_TEMPLATE, "training", "training");
-
-    private static final String TEST_FILE = String.format(DATA_FILE_TEMPLATE, "test", "test");
-
-    private static DataSet trainingSet = readTrainingDataSet();
-    private static DataSet testSet = readTestDataSet();
+    private static DataSet trainingSet = DataSetUtil.readNurseryTrainingDataSet();
+    private static DataSet testSet = DataSetUtil.readNurseryTestDataSet();
     private static Instance[] testInstances = testSet.getInstances();
 
     private static final int outputLayer = 1;
     private static int inputLayer = trainingSet.getDescription().getAttributeCount() - 1;
     private static int hiddenLayer = Math.round((outputLayer + inputLayer) * 2/3);
     private static BackPropagationNetworkFactory factory = new BackPropagationNetworkFactory();
-
-    private static BackPropagationNetwork network;
 
     private static String results = "";
 
@@ -64,7 +56,7 @@ public class NNClassificationTest {
     }
 
     private static void runTests() {
-        network = factory.createClassificationNetwork(new int[] {inputLayer, hiddenLayer, outputLayer});
+        BackPropagationNetwork network = factory.createClassificationNetwork(new int[] {inputLayer, hiddenLayer, outputLayer});
 
             double start = System.nanoTime(), end, trainingTime, testingTime;
             int correct = 0, incorrect = 0;
@@ -79,14 +71,18 @@ public class NNClassificationTest {
 
             double predicted, actual;
             start = System.nanoTime();
-            for(int i = 0; i < testInstances.length; i++) {
-                network.setInputValues(testInstances[i].getData());
+            for(Instance testInstance : testInstances) {
+                network.setInputValues(testInstance.getData());
                 network.run();
 
-                predicted = Double.parseDouble(testInstances[i].getLabel().toString());
+                predicted = Double.parseDouble(testInstance.getLabel().toString());
                 actual = Double.parseDouble(network.getOutputValues().toString());
 
-                double trash = Math.abs(predicted - actual) < 0.5 ? correct++ : incorrect++;
+                if (Math.abs(predicted - actual) < 0.5) {
+                    correct++;
+                } else {
+                    incorrect++;
+                }
             }
             end = System.nanoTime();
             testingTime = end - start;
@@ -112,37 +108,5 @@ public class NNClassificationTest {
             }
 
         System.out.println(results);
-    }
-
-    private static DataSet readTrainingDataSet() {
-        return readDataSet(TRAINING_FILE);
-    }
-
-    private static DataSet readTestDataSet() {
-        return readDataSet(TEST_FILE);
-    }
-
-    private static DataSet readDataSet(String fileName) {
-        ArffDataSetReader reader = new ArffDataSetReader(fileName);
-        DataSet ds;
-        try {
-            ds = reader.read();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        LabelSplitFilter lsf = new LabelSplitFilter();
-        lsf.filter(ds);
-
-        // Try to classify if the person was recommended or not.
-        for(Instance instance : ds) {
-            instance.setLabel(new Instance(instance.getLabel().getDiscrete() == 0 ? 0 : 1));
-        }
-
-        System.out.println(ds);
-        System.out.println(new DataSetDescription(ds));
-
-        return ds;
     }
 }
