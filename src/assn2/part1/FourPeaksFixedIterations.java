@@ -1,4 +1,4 @@
-package assn2.test;
+package assn2.part1;
 
 import dist.DiscreteDependencyTree;
 import dist.DiscreteUniformDistribution;
@@ -15,36 +15,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FourPeaksFixedIterationsVariousT {
+public class FourPeaksFixedIterations {
 
     public static void main(String[] args) {
-        FourPeaksTestRunner testRunner = new FourPeaksTestRunner.Builder()
-                .setN(100)
-                .setT(10)
-                .build();
-        CSVWriter writer = new CSVWriter("fourPeaksFixedIterationsLargeT.csv", testRunner.getHeaders());
-
-        try {
-            writer.open();
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-        }
-
-        trainWithNT(writer, 100, 1);
-        trainWithNT(writer, 100, 5);
-        trainWithNT(writer, 100, 10);
-        trainWithNT(writer, 100, 25);
-        trainWithNT(writer, 100, 50);
-        trainWithNT(writer, 100, 100);
-
-        try {
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-        }
-    }
-
-    private static void trainWithNT(CSVWriter writer, int N, int T) {
+        int N = 100;
+        int T = 100 / 10;
         FourPeaksTestRunner testRunner = new FourPeaksTestRunner.Builder()
                 .setN(N)
                 .setT(T)
@@ -71,6 +46,14 @@ public class FourPeaksFixedIterationsVariousT {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         algorithms.add(new MIMIC(200, 100, pop));
 
+        CSVWriter writer = new CSVWriter("fourPeaksFixedIterations.csv", testRunner.getHeaders());
+
+        try {
+            writer.open();
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
+
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 1);
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 50);
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 100);
@@ -78,6 +61,14 @@ public class FourPeaksFixedIterationsVariousT {
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 1000);
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 5000);
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 10000);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 50000);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 100000);
+
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
     }
 
     private static void trainTestRunnerAndWrite(CSVWriter writer, OptimizationTestRunner testRunner,

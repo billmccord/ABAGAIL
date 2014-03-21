@@ -1,4 +1,4 @@
-package assn2.test;
+package assn2.part1;
 
 import dist.DiscreteDependencyTree;
 import dist.DiscreteUniformDistribution;
@@ -15,16 +15,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CountOnesFixedIterations {
+public class KnapsackFixedIterations {
 
     public static void main(String[] args) {
-        int N = 100;
-        CountOnesTestRunner testRunner = new CountOnesTestRunner.Builder()
-                .setN(N)
+        int numItems = 40;
+        int copiesEach = 5;
+        KnapsackTestRunner testRunner = new KnapsackTestRunner.Builder()
+                .setNumItems(numItems)
+                .setCopiesEach(copiesEach)
                 .build();
 
-        int[] ranges = new int[N];
-        Arrays.fill(ranges, 2);
+        int[] ranges = new int[numItems];
+        Arrays.fill(ranges, copiesEach + 1);
         EvaluationFunction ef = testRunner.getEvaluationFunction();
 
         ArrayList<OptimizationAlgorithm> algorithms = new ArrayList<OptimizationAlgorithm>();
@@ -44,7 +46,7 @@ public class CountOnesFixedIterations {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         algorithms.add(new MIMIC(200, 100, pop));
 
-        CSVWriter writer = new CSVWriter("countOnesFixedIterations.csv", testRunner.getHeaders());
+        CSVWriter writer = new CSVWriter("knapsackFixedIterations.csv", testRunner.getHeaders());
 
         try {
             writer.open();
@@ -59,6 +61,8 @@ public class CountOnesFixedIterations {
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 1000);
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 5000);
         trainTestRunnerAndWrite(writer, testRunner, algorithms, 10000);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 50000);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 100000);
 
         try {
             writer.close();

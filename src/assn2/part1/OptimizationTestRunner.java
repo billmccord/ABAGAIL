@@ -1,4 +1,4 @@
-package assn2.test;
+package assn2.part1;
 
 import assn2.util.CsvWriteable;
 import assn2.util.SimpleStopWatch;

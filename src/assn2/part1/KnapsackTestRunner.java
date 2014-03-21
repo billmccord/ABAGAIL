@@ -1,4 +1,4 @@
-package assn2.test;
+package assn2.part1;
 
 import opt.EvaluationFunction;
 import opt.OptimizationAlgorithm;

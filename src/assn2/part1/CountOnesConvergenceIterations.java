@@ -1,4 +1,4 @@
-package assn2.test;
+package assn2.part1;
 
 import dist.DiscreteDependencyTree;
 import dist.DiscreteUniformDistribution;
@@ -15,14 +15,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FourPeaksFixedIterations {
+public class CountOnesConvergenceIterations {
 
     public static void main(String[] args) {
-        int N = 100;
-        int T = 100 / 10;
-        FourPeaksTestRunner testRunner = new FourPeaksTestRunner.Builder()
+        CountOnesTestRunner testRunner = new CountOnesTestRunner.Builder().build();
+        CSVWriter writer = new CSVWriter("countOnesConvergenceIterations.csv", testRunner.getHeaders());
+
+        try {
+            writer.open();
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
+
+        runForN(writer, 50);
+        runForN(writer, 100);
+        runForN(writer, 500);
+        runForN(writer, 1000);
+        runForN(writer, 1500);
+
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
+    }
+
+    private static void runForN(CSVWriter writer, int N) {
+        CountOnesTestRunner testRunner = new CountOnesTestRunner.Builder()
                 .setN(N)
-                .setT(T)
                 .build();
 
         int[] ranges = new int[N];
@@ -46,34 +66,13 @@ public class FourPeaksFixedIterations {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         algorithms.add(new MIMIC(200, 100, pop));
 
-        CSVWriter writer = new CSVWriter("fourPeaksFixedIterations.csv", testRunner.getHeaders());
-
-        try {
-            writer.open();
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-        }
-
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 1);
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 50);
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 100);
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 500);
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 1000);
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 5000);
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 10000);
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 50000);
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 100000);
-
-        try {
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-        }
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 200000, 100);
     }
 
     private static void trainTestRunnerAndWrite(CSVWriter writer, OptimizationTestRunner testRunner,
-                                                List<OptimizationAlgorithm> algorithms, int numIterations) {
-        testRunner.putFixedIterationTrainerAlgorithms(algorithms, numIterations);
+                                                List<OptimizationAlgorithm> algorithms, int numIterations,
+                                                int confirmationIterations) {
+        testRunner.putConvergenceTrainerAlgorithms(algorithms, 0.0, numIterations, confirmationIterations);
         testRunner.train();
         try {
             testRunner.write(writer);

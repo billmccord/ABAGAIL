@@ -1,51 +1,43 @@
-package assn2.test;
+package assn2.part1;
 
 import opt.EvaluationFunction;
 import opt.OptimizationAlgorithm;
-import opt.example.FourPeaksEvaluationFunction;
+import opt.example.CountOnesEvaluationFunction;
 import shared.writer.CSVWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class FourPeaksTestRunner extends OptimizationTestRunner {
+public class CountOnesTestRunner extends OptimizationTestRunner {
 
-    private String[] FOUR_PEAKS_FIELDS = {
-            "N",
-            "T"
+    private String[] COUNT_ONES_FIELDS = {
+            "N"
     };
 
     private int n = 100;
 
-    private int t = 10;
-
-    private FourPeaksEvaluationFunction evaluationFunction;
+    private CountOnesEvaluationFunction evaluationFunction;
 
     public static class Builder {
-        private FourPeaksTestRunner fourPeaksTestRunner;
+        private CountOnesTestRunner countOnesTestRunner;
 
         public Builder() {
-            this.fourPeaksTestRunner = new FourPeaksTestRunner();
+            this.countOnesTestRunner = new CountOnesTestRunner();
         }
 
         public Builder setN(int n) {
-            fourPeaksTestRunner.n = n;
+            countOnesTestRunner.n = n;
             return this;
         }
 
-        public Builder setT(int t) {
-            fourPeaksTestRunner.t = t;
-            return this;
-        }
-
-        public FourPeaksTestRunner build() {
-            fourPeaksTestRunner.generateEvaluationFunction();
-            return fourPeaksTestRunner;
+        public CountOnesTestRunner build() {
+            countOnesTestRunner.generateEvaluationFunction();
+            return countOnesTestRunner;
         }
     }
 
-    private FourPeaksTestRunner() {
+    private CountOnesTestRunner() {
     }
 
     public EvaluationFunction getEvaluationFunction() {
@@ -53,13 +45,13 @@ public class FourPeaksTestRunner extends OptimizationTestRunner {
     }
 
     private void generateEvaluationFunction() {
-        evaluationFunction = new FourPeaksEvaluationFunction(t);
+        evaluationFunction = new CountOnesEvaluationFunction();
     }
 
     @Override
     public String[] getHeaders() {
         ArrayList<String> headers = new ArrayList<String>(Arrays.asList(super.getHeaders()));
-        headers.addAll(Arrays.asList(FOUR_PEAKS_FIELDS));
+        headers.addAll(Arrays.asList(COUNT_ONES_FIELDS));
         return headers.toArray(new String[headers.size()]);
     }
 
@@ -67,6 +59,5 @@ public class FourPeaksTestRunner extends OptimizationTestRunner {
     protected void write(CSVWriter writer, OptimizationAlgorithm a) throws IOException {
         super.write(writer, a);
         writer.write(Integer.toString(n));
-        writer.write(Integer.toString(t));
     }
 }

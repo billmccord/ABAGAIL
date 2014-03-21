@@ -1,4 +1,4 @@
-package assn2.test;
+package assn2.part1;
 
 import dist.DiscreteDependencyTree;
 import dist.DiscreteUniformDistribution;
@@ -15,11 +15,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CountOnesConvergenceIterations {
+public class FourPeaksFixedIterationsVariousT {
 
     public static void main(String[] args) {
-        CountOnesTestRunner testRunner = new CountOnesTestRunner.Builder().build();
-        CSVWriter writer = new CSVWriter("countOnesConvergenceIterations.csv", testRunner.getHeaders());
+        FourPeaksTestRunner testRunner = new FourPeaksTestRunner.Builder()
+                .setN(100)
+                .setT(10)
+                .build();
+        CSVWriter writer = new CSVWriter("fourPeaksFixedIterationsLargeT.csv", testRunner.getHeaders());
 
         try {
             writer.open();
@@ -27,11 +30,12 @@ public class CountOnesConvergenceIterations {
             e.printStackTrace(System.out);
         }
 
-        runForN(writer, 50);
-        runForN(writer, 100);
-        runForN(writer, 500);
-        runForN(writer, 1000);
-        runForN(writer, 1500);
+        trainWithNT(writer, 100, 1);
+        trainWithNT(writer, 100, 5);
+        trainWithNT(writer, 100, 10);
+        trainWithNT(writer, 100, 25);
+        trainWithNT(writer, 100, 50);
+        trainWithNT(writer, 100, 100);
 
         try {
             writer.close();
@@ -40,9 +44,10 @@ public class CountOnesConvergenceIterations {
         }
     }
 
-    private static void runForN(CSVWriter writer, int N) {
-        CountOnesTestRunner testRunner = new CountOnesTestRunner.Builder()
+    private static void trainWithNT(CSVWriter writer, int N, int T) {
+        FourPeaksTestRunner testRunner = new FourPeaksTestRunner.Builder()
                 .setN(N)
+                .setT(T)
                 .build();
 
         int[] ranges = new int[N];
@@ -66,13 +71,18 @@ public class CountOnesConvergenceIterations {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         algorithms.add(new MIMIC(200, 100, pop));
 
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 200000, 100);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 1);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 50);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 100);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 500);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 1000);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 5000);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 10000);
     }
 
     private static void trainTestRunnerAndWrite(CSVWriter writer, OptimizationTestRunner testRunner,
-                                                List<OptimizationAlgorithm> algorithms, int numIterations,
-                                                int confirmationIterations) {
-        testRunner.putConvergenceTrainerAlgorithms(algorithms, 0.0, numIterations, confirmationIterations);
+                                                List<OptimizationAlgorithm> algorithms, int numIterations) {
+        testRunner.putFixedIterationTrainerAlgorithms(algorithms, numIterations);
         testRunner.train();
         try {
             testRunner.write(writer);

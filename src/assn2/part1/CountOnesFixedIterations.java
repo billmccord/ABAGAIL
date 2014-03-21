@@ -1,4 +1,4 @@
-package assn2.test;
+package assn2.part1;
 
 import dist.DiscreteDependencyTree;
 import dist.DiscreteUniformDistribution;
@@ -15,43 +15,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class KnapsackConvergenceIterations {
+public class CountOnesFixedIterations {
 
     public static void main(String[] args) {
-        KnapsackTestRunner testRunner = new KnapsackTestRunner.Builder().build();
-        CSVWriter writer = new CSVWriter("knapsackConvergenceIterations.csv", testRunner.getHeaders());
-
-        try {
-            writer.open();
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-        }
-
-        runForItems(writer, 20);
-        runForItems(writer, 40);
-        runForItems(writer, 60);
-        runForItems(writer, 80);
-        runForItems(writer, 100);
-        runForItems(writer, 200);
-        runForItems(writer, 400);
-        runForItems(writer, 600);
-
-        try {
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-        }
-    }
-
-    private static void runForItems(CSVWriter writer, int numItems) {
-        int copiesEach = 5;
-        KnapsackTestRunner testRunner = new KnapsackTestRunner.Builder()
-                .setNumItems(numItems)
-                .setCopiesEach(copiesEach)
+        int N = 100;
+        CountOnesTestRunner testRunner = new CountOnesTestRunner.Builder()
+                .setN(N)
                 .build();
 
-        int[] ranges = new int[numItems];
-        Arrays.fill(ranges, copiesEach + 1);
+        int[] ranges = new int[N];
+        Arrays.fill(ranges, 2);
         EvaluationFunction ef = testRunner.getEvaluationFunction();
 
         ArrayList<OptimizationAlgorithm> algorithms = new ArrayList<OptimizationAlgorithm>();
@@ -71,13 +44,32 @@ public class KnapsackConvergenceIterations {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         algorithms.add(new MIMIC(200, 100, pop));
 
-        trainTestRunnerAndWrite(writer, testRunner, algorithms, 200000, 100);
+        CSVWriter writer = new CSVWriter("countOnesFixedIterations.csv", testRunner.getHeaders());
+
+        try {
+            writer.open();
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
+
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 1);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 50);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 100);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 500);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 1000);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 5000);
+        trainTestRunnerAndWrite(writer, testRunner, algorithms, 10000);
+
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
     }
 
     private static void trainTestRunnerAndWrite(CSVWriter writer, OptimizationTestRunner testRunner,
-                                                List<OptimizationAlgorithm> algorithms, int numIterations,
-                                                int confirmationIterations) {
-        testRunner.putConvergenceTrainerAlgorithms(algorithms, 0.0, numIterations, confirmationIterations);
+                                                List<OptimizationAlgorithm> algorithms, int numIterations) {
+        testRunner.putFixedIterationTrainerAlgorithms(algorithms, numIterations);
         testRunner.train();
         try {
             testRunner.write(writer);

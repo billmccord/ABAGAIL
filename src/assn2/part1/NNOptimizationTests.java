@@ -1,4 +1,4 @@
-package assn2.test;
+package assn2.part1;
 
 import func.nn.backprop.BackPropagationNetwork;
 import func.nn.backprop.BackPropagationNetworkFactory;
