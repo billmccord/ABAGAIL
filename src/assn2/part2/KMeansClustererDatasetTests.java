@@ -2,15 +2,12 @@ package assn2.part2;
 
 import assn2.util.AttributeLabeledDataSet;
 import assn2.util.DataSetUtil;
-import dist.MultivariateGaussian;
-import func.EMClusterer;
 import func.KMeansClusterer;
 import shared.DataSet;
 import shared.writer.CSVWriter;
 import util.linalg.Vector;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,10 +16,9 @@ import java.util.List;
  * @author Andrew Guillory gtg008g@mail.gatech.edu
  * @version 1.0
  */
-public class EMClustererTest {
+public class KMeansClustererDatasetTests {
     public static final String[] FIELDS = {
             "k",
-            "Iterations",
             "Runtime",
             "Min Distance",
             "Instance Attr Min Var",
@@ -34,42 +30,33 @@ public class EMClustererTest {
             "Max Var Instance Attrs"
     };
 
+
     /**
      * The test main
      * @param args ignored
      */
     public static void main(String[] args) throws Exception {
-        CSVWriter writer = new CSVWriter("EMNurseryResults.csv", FIELDS);
+        CSVWriter writer = new CSVWriter("kMeansNurseryResults.csv", FIELDS);
         writer.open();
         AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readNurseryAttributeLabeledTrainingDataSet();
-        for (int k = 1; k <= 10; k++) {
-            evaluateDataSet(attributeLabeledDataSet, k, 10, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 100, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 500, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 1000, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 2000, writer);
+        for (int k = 1; k <= 20; k++) {
+            evaluateDataSet(attributeLabeledDataSet, k, writer);
         }
         writer.close();
 
-        writer = new CSVWriter("EMLungResults.csv", FIELDS);
+        writer = new CSVWriter("kMeansLungResults.csv", FIELDS);
         writer.open();
         attributeLabeledDataSet = DataSetUtil.readLungTop101AttributeLabeledTrainingDataSet();
-        for (int k = 1; k <= 10; k++) {
-            evaluateDataSet(attributeLabeledDataSet, k, 10, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 100, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 500, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 1000, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 2000, writer);
+        for (int k = 1; k <= 20; k++) {
+            evaluateDataSet(attributeLabeledDataSet, k, writer);
         }
         writer.close();
     }
 
-    public static void evaluateDataSet(AttributeLabeledDataSet attributeLabeledDataSet, int k, int iterations,
-                                       CSVWriter writer) throws IOException {
-        System.out.println("\nEvaluating with k = " + k + "; iterations = " + iterations);
+    public static void evaluateDataSet(AttributeLabeledDataSet attributeLabeledDataSet, int k, CSVWriter writer) throws IOException {
         DataSet set = attributeLabeledDataSet.getDataSet();
 
-        System.out.println("DataSet Instances");
+        System.out.println("\nDataSet Instances");
         Vector attrVariance = DataSetUtil.computeVarianceOfEachVectorPos(DataSetUtil.instancesToDataVectors(set.getInstances()));
         System.out.println("Attribute variance\n" + attrVariance.toString());
 
@@ -86,26 +73,21 @@ public class EMClustererTest {
         List<Integer> sortedAttrInstanceVarianceIndexes = DataSetUtil.getVectorIndexesSortedByValueDesc(attrVariance);
         System.out.println(DataSetUtil.indexesToAttributes(sortedAttrInstanceVarianceIndexes, attributeLabeledDataSet));
 
-        EMClusterer em;
+        KMeansClusterer km;
         List<Integer> sortedAttrClusterVarianceIndexes;
-        double numRuns = 1.0, totalMinDistance = 0.0;
+        double numRuns = 100.0, totalMinDistance = 0.0;
         double start, totalTime = 0.0, timeDivisor = Math.pow(10,9);
         double totalMinClusterVar = 0.0, totalMaxClusterVar = 0.0, totalAvgClusterVar = 0.0;
 
         for (double i = 0; i < numRuns; i++) {
             start = System.nanoTime();
-            em = new EMClusterer(k, 1E-6, iterations);
-            em.estimate(set);
+            km = new KMeansClusterer(k);
+            km.estimate(set);
             totalTime += (System.nanoTime() - start) / timeDivisor;
 
-            int meanCount = em.getMixture().getComponents().length;
-            ArrayList<Vector> means = new ArrayList<Vector>(meanCount);
-            for (int j = 0; j < meanCount; j++) {
-                means.add(((MultivariateGaussian)em.getMixture().getComponents()[j]).getMean());
-            }
-
-            System.out.println("\nEM Clusters");
-            Vector clusterVariance = DataSetUtil.computeVarianceOfEachVectorPos(means);
+            System.out.println("\nKMeans Clusters");
+            Vector clusterVariance = DataSetUtil.computeVarianceOfEachVectorPos(
+                    DataSetUtil.instancesToDataVectors(km.getClusterCenters()));
             System.out.println("Cluster variance\n" + clusterVariance.toString());
 
             List<Double> clusterVariances = DataSetUtil.arrayToList(clusterVariance.getDataCopy());
@@ -124,11 +106,10 @@ public class EMClustererTest {
             totalMinDistance += DataSetUtil.minDistance(sortedAttrInstanceVarianceIndexes, sortedAttrClusterVarianceIndexes);
             System.out.println("\nMin distance between sorted indexes\n" + totalMinDistance / (i+1));
 
-            System.out.println(em.toString());
+            System.out.println(km.toString());
         }
 
         writer.write(Integer.toString(k));
-        writer.write(Integer.toString(iterations));
         writer.write(Double.toString(totalTime / numRuns));
         writer.write(Double.toString(totalMinDistance / numRuns));
         writer.write(Double.toString(minInstanceVar));
