@@ -266,14 +266,14 @@ public abstract class Matrix implements Serializable, Copyable {
      */
     public String toString() {
         DecimalFormat df = new DecimalFormat("0.000000");
-        String result = "";
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < m(); i++) {
             for (int j = 0; j < n(); j++) {
-                 result += df.format(get(i,j)) + "\t";
+                 builder.append(df.format(get(i,j))).append("\t");
             }
-            result += "\n";
+            builder.append("\n");
         }
-        return result;
+        return builder.toString();
     }
     
 

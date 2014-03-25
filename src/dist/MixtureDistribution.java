@@ -139,11 +139,12 @@ public class MixtureDistribution extends AbstractDistribution implements Copyabl
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        String result = componentDistribution.toString() + "\n";
+        StringBuilder builder = new StringBuilder(componentDistribution.toString()).append("\n");
         for (int i = 0; i < components.length; i++) {
-            result += components[i] + "\n";
+            builder.append(components[i]).append("\n");
         }
-        return result + "\n";
+        builder.append("\n");
+        return builder.toString();
     }
 
     /**

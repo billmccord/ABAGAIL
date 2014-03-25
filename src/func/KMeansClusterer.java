@@ -96,6 +96,12 @@ public class KMeansClusterer extends AbstractConditionalDistribution implements 
         // the main loop
         do {
             changed = false;
+
+            // keep track of the largest of the distances to the new assignments in case we have a cluster with
+            // no instances
+            double largestDist = 0.;
+            int largestDistIdx = 0;
+
             // make the assignments
             for (int i = 0; i < set.size(); i++) {
                 // find the closest center
@@ -110,6 +116,13 @@ public class KMeansClusterer extends AbstractConditionalDistribution implements 
                         closest = j;
                     }
                 }
+
+                // check largest distance
+                if (closestDistance > largestDist) {
+                    largestDist = closestDistance;
+                    largestDistIdx = i;
+                }
+
                 if (assignments[i] != closest) {
                     changed = true;
                 }
@@ -117,6 +130,23 @@ public class KMeansClusterer extends AbstractConditionalDistribution implements 
             }
             if (changed) {
                 double[] assignmentCount = new double[k];
+
+                // update assignmentCount
+//                for (int cluster=0; cluster<k; cluster++) {
+//                    assignmentCount[cluster] = 0;
+//                }
+//                for (int i = 0; i < set.size(); i++) {
+//                    assignmentCount[assignments[i]] += set.get(i).getWeight();
+//                }
+//                // check for 0 assignment count and assign the instance that is farthest from any centroids
+//                for (int cluster=0; cluster<k; cluster++) {
+//                    if (assignmentCount[cluster] == 0) {
+//                        assignmentCount[cluster] += set.get(largestDistIdx).getWeight();
+//                        assignmentCount[assignments[largestDistIdx]] -= set.get(largestDistIdx).getWeight();
+//                        assignments[largestDistIdx] = cluster;
+//                    }
+//                }
+
                 // make the new clusters
                 for (int i = 0; i < k; i++) {
                     clusterCenters[i].setData(new DenseVector(
@@ -125,10 +155,14 @@ public class KMeansClusterer extends AbstractConditionalDistribution implements 
                 for (int i = 0; i < set.size(); i++) {
                     clusterCenters[assignments[i]].getData().plusEquals(
                         set.get(i).getData().times(set.get(i).getWeight()));
-                    assignmentCount[assignments[i]] += set.get(i).getWeight();    
+                    assignmentCount[assignments[i]] += set.get(i).getWeight();
                 }
                 for (int i = 0; i < k; i++) {
-                    clusterCenters[i].getData().timesEquals(1/assignmentCount[i]);
+                    if (assignmentCount[i] == 0) {
+                        clusterCenters[i].getData().timesEquals(0);
+                    } else {
+                        clusterCenters[i].getData().timesEquals(1/assignmentCount[i]);
+                    }
                 }
             }
         } while (changed);
@@ -148,16 +182,16 @@ public class KMeansClusterer extends AbstractConditionalDistribution implements 
     public Instance[] getClusterCenters() {
         return clusterCenters;
     }
-        
+
     /**
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        String result = "k = " + k + "\n";
+        StringBuilder builder = new StringBuilder("k = ").append(k).append("\n");
         for (int i = 0; i < clusterCenters.length; i++) {
-            result += clusterCenters[i].toString() + "\n";
+            builder.append(clusterCenters[i].toString()).append("\n");
         }
-        return result;
+        return builder.toString();
     }
 
 

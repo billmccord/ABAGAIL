@@ -2,6 +2,9 @@ package util.linalg;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import shared.Copyable;
 
@@ -26,6 +29,8 @@ public abstract class Vector implements Serializable, Copyable {
      * @return the element
      */
     public abstract double get(int i);
+
+    public abstract double[] getDataCopy();
     
     /**
      * Get some sub portion of the vector
@@ -291,16 +296,15 @@ public abstract class Vector implements Serializable, Copyable {
      */
     public String toString() {
         DecimalFormat df = new DecimalFormat("0.000000");
-        String result = "";
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < size(); i++) {
-            result += df.format(get(i));
+            builder.append(df.format(get(i)));
             if (i + 1 < size()) {
-                result += ", ";
+                builder.append(", ");
             }
         }
-        return result;
+        return builder.toString();
     }
-
 }
 
 

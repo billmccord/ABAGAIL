@@ -1,5 +1,8 @@
 package util.linalg;
 
+import java.util.Arrays;
+import java.util.Iterator;
+
 /**
  * An implementation of a vector that is dense
  * @author Andrew Guillory gtg008g@mail.gatech.edu
@@ -41,6 +44,10 @@ public class DenseVector extends Vector {
     public double get(int i) {
         return data[i];
     }
+
+    public double[] getDataCopy() {
+        return Arrays.copyOf(data, data.length);
+    }
     
     /**
      * @see linalg.Vector#set(int, double)
@@ -69,6 +76,4 @@ public class DenseVector extends Vector {
     public static Vector e(int size) {
         return e(0, size);
     }
-
-
 }

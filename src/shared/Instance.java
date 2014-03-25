@@ -250,14 +250,14 @@ public class Instance implements Serializable, Copyable {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        String result = data.toString();
+        StringBuilder builder = new StringBuilder(data.toString());
         if (label != null) {
-            result += " : " + label.toString();
+            builder.append(" : ").append(label.toString());
         }
         if (weight != 1.0) {
-            result += " x " + weight;
+            builder.append(" x ").append(weight);
         }
-        return result;
+        return builder.toString();
     }
 
 

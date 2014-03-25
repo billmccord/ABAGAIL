@@ -24,6 +24,7 @@ public class ArffDataSetReader extends DataSetReader {
 	private final String DATA_TAG = "@data";
 	private final String ATTRIBUTE_TAG = "@attribute";
 	private final int SPLIT_LIMIT = 3;
+    private ArrayList<String> attributeNames;
 
 	
 	public ArffDataSetReader(String file) {
@@ -45,6 +46,10 @@ public class ArffDataSetReader extends DataSetReader {
 		}
 	}
 
+    public List<String> getAttributeNames() {
+        return attributeNames;
+    }
+
 	/**
 	 * Parses the buffer in to a map attribute->
 	 * @param in Buffer to read from
@@ -56,6 +61,7 @@ public class ArffDataSetReader extends DataSetReader {
 		String line = in.readLine();
 		List<Map<String, Double>> attributes
 			= new ArrayList<Map<String, Double>>();
+        attributeNames = new ArrayList<String>();
 		while (line != null && line.toLowerCase().indexOf(DATA_TAG) == -1) {
 			if (!line.isEmpty() && line.charAt(0) != '%') {
 				String[] parts = line.split("\\s", SPLIT_LIMIT);
@@ -64,6 +70,8 @@ public class ArffDataSetReader extends DataSetReader {
 				    //NOTE: for REAL and INTEGER types, this will do nothing but those types are handled
 				    // in processInstances
 					String[] values = parts[2].replaceAll(" |\\{|\\}|'","").split(",");
+                    System.out.println("Attribute " + attributes.size() + " name: " + parts[1] + ", values: " + parts[2]);
+                    attributeNames.add(parts[1]);
 					double id = 0.0;
 					Map<String, Double> valMap = new HashMap<String, Double>();
 					for (String s : values) {

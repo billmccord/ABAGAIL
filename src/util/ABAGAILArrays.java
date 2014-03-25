@@ -19,18 +19,18 @@ public class ABAGAILArrays {
      * the decimal place to use
      */
     public static String toString(double[] array, int digits) {
-        String pattern = "0.";
+        StringBuilder builder = new StringBuilder("0.");
         for (int i = 0; i < digits; i++) {
-            pattern += "0";
+            builder.append("0");
         }
-        pattern += "E00";
-        DecimalFormat df = new DecimalFormat(pattern);
-        String result = "{";
+        builder.append("E00");
+        DecimalFormat df = new DecimalFormat(builder.toString());
+        builder = new StringBuilder("{");
         for (int i = 0; i < array.length - 1; i++) {
-            result += df.format(array[i]) + ", ";
+            builder.append(df.format(array[i])).append(", ");
         }
-        result += df.format(array[array.length - 1]) + "}";
-        return result;
+        builder.append(df.format(array[array.length - 1])).append("}");
+        return builder.toString();
     }
     
     /**
@@ -40,31 +40,30 @@ public class ABAGAILArrays {
      * the decimal place to use
      */
     public static String toString(double[][] array, int digits) {
-        String pattern = "0.";
+        StringBuilder builder = new StringBuilder("0.");
         for (int i = 0; i < digits; i++) {
-            pattern += "0";
+            builder.append("0");
         }
-        pattern += "E00";
-        DecimalFormat df = new DecimalFormat(pattern);
-        String result = "{";
+        builder.append("E00");
+        DecimalFormat df = new DecimalFormat(builder.toString());
+        builder = new StringBuilder("{");
         for (int i = 0; i < array.length; i++) {
             if (i != 0) {
-                result += "\n ";
+                builder.append("\n ");
             } 
-            result += " { ";
+            builder.append(" { ");
             for (int j = 0; j < array[i].length - 1; j++) {
-                result += df.format(array[i][j]) + ", ";
+                builder.append(df.format(array[i][j])).append(", ");
             }
-            result += df.format(array[i][array[i].length - 1]) + " },";
+            builder.append(df.format(array[i][array[i].length - 1])).append(" },");
         }
-        result += " }";
-        return result;
+        builder.append(" }");
+        return builder.toString();
     }
     
     /**
      * Print out an array
      * @param array the array to print
-     * @param digits the number of digits after
      * the decimal place to use
      */
     public static String toString(double[] array) {
@@ -74,7 +73,6 @@ public class ABAGAILArrays {
     /**
      * Print out an array
      * @param array the array to print
-     * @param digits the number of digits after
      * the decimal place to use
      */
     public static String toString(double[][] array) {
@@ -87,33 +85,33 @@ public class ABAGAILArrays {
      * @param array the array to print
      */
     public static String toString(int[][] array) {
-        String result = "{";
+        StringBuilder builder = new StringBuilder("{");
         for (int i = 0; i < array.length; i++) {
             if (i != 0) {
-                result += "\n ";
+                builder.append("\n ");
             } 
-            result += " { ";
+            builder.append(" { ");
             for (int j = 0; j < array[i].length - 1; j++) {
-                result += array[i][j] + ", ";
+                builder.append(array[i][j]).append(", ");
             }
-            result += array[i][array[i].length - 1] + " }";
+            builder.append(array[i][array[i].length - 1]).append(" }");
         }
-        result += " }";
-        return result;
+        builder.append(" }");
+        return builder.toString();
     }
 
     /**
      * Print an int array to a string
-     * @param data the data
+     * @param array the data
      * @return the string
      */
     public static String toString(int[] array) {
-        String result = "{";
+        StringBuilder builder = new StringBuilder("{");
         for (int i = 0; i < array.length - 1; i++) {
-            result += array[i] + ", ";
+            builder.append(array[i]).append(", ");
         }
-        result += array[array.length - 1] + "}";
-        return result;
+        builder.append(array[array.length - 1]).append("}");
+        return builder.toString();
     }
 
     /**
@@ -122,12 +120,12 @@ public class ABAGAILArrays {
      * @return the string
      */
     public static String toString(Object[] objects) {
-        String result = "{";
+        StringBuilder builder = new StringBuilder("{");
         for (int i = 0; i < objects.length - 1; i++) {
-            result += objects[i] + ", ";
+            builder.append(objects[i]).append(", ");
         }
-        result += objects[objects.length - 1] + "}";
-        return result;
+        builder.append(objects[objects.length - 1]).append("}");
+        return builder.toString();
     }   
 
     
