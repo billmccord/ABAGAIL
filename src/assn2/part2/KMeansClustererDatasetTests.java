@@ -30,30 +30,34 @@ public class KMeansClustererDatasetTests {
             "Max Var Instance Attrs"
     };
 
-
     /**
      * The test main
      * @param args ignored
      */
     public static void main(String[] args) throws Exception {
+        KMeansClustererDatasetTests kMeansClustererDatasetTests = new KMeansClustererDatasetTests();
         CSVWriter writer = new CSVWriter("kMeansNurseryResults.csv", FIELDS);
         writer.open();
         AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readNurseryAttributeLabeledTrainingDataSet();
-        for (int k = 1; k <= 20; k++) {
-            evaluateDataSet(attributeLabeledDataSet, k, writer);
-        }
+        kMeansClustererDatasetTests.runKMeansTests(writer, attributeLabeledDataSet, 100);
         writer.close();
 
         writer = new CSVWriter("kMeansLungResults.csv", FIELDS);
         writer.open();
         attributeLabeledDataSet = DataSetUtil.readLungTop101AttributeLabeledTrainingDataSet();
-        for (int k = 1; k <= 20; k++) {
-            evaluateDataSet(attributeLabeledDataSet, k, writer);
-        }
+        kMeansClustererDatasetTests.runKMeansTests(writer, attributeLabeledDataSet, 100);
         writer.close();
     }
 
-    public static void evaluateDataSet(AttributeLabeledDataSet attributeLabeledDataSet, int k, CSVWriter writer) throws IOException {
+    public void runKMeansTests(CSVWriter writer, AttributeLabeledDataSet attributeLabeledDataSet, int numRuns) throws IOException {
+        for (int k = 1; k <= 20; k++) {
+            evaluateDataSet(attributeLabeledDataSet, k, writer, numRuns);
+            writer.nextRecord();
+        }
+    }
+
+    public void evaluateDataSet(AttributeLabeledDataSet attributeLabeledDataSet, int k, CSVWriter writer, int numRuns)
+            throws IOException {
         DataSet set = attributeLabeledDataSet.getDataSet();
 
         System.out.println("\nDataSet Instances");
@@ -75,7 +79,7 @@ public class KMeansClustererDatasetTests {
 
         KMeansClusterer km;
         List<Integer> sortedAttrClusterVarianceIndexes;
-        double numRuns = 100.0, totalMinDistance = 0.0;
+        double totalMinDistance = 0.0;
         double start, totalTime = 0.0, timeDivisor = Math.pow(10,9);
         double totalMinClusterVar = 0.0, totalMaxClusterVar = 0.0, totalAvgClusterVar = 0.0;
 
@@ -110,17 +114,16 @@ public class KMeansClustererDatasetTests {
         }
 
         writer.write(Integer.toString(k));
-        writer.write(Double.toString(totalTime / numRuns));
-        writer.write(Double.toString(totalMinDistance / numRuns));
+        writer.write(Double.toString(totalTime / (double)numRuns));
+        writer.write(Double.toString(totalMinDistance / (double)numRuns));
         writer.write(Double.toString(minInstanceVar));
         writer.write(Double.toString(maxInstanceVar));
         writer.write(Double.toString(avgInstanceVar));
-        writer.write(Double.toString(totalMinClusterVar / numRuns));
-        writer.write(Double.toString(totalMaxClusterVar / numRuns));
-        writer.write(Double.toString(totalAvgClusterVar / numRuns));
+        writer.write(Double.toString(totalMinClusterVar / (double)numRuns));
+        writer.write(Double.toString(totalMaxClusterVar / (double)numRuns));
+        writer.write(Double.toString(totalAvgClusterVar / (double)numRuns));
         writer.write("\"" + DataSetUtil.indexesToAttributes(
                 sortedAttrInstanceVarianceIndexes.subList(0, Math.min(sortedAttrInstanceVarianceIndexes.size(), 10)),
                 attributeLabeledDataSet) + "\"");
-        writer.nextRecord();
     }
 }

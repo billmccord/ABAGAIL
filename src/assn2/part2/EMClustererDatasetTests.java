@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * Testing
+ *
  * @author Andrew Guillory gtg008g@mail.gatech.edu
  * @version 1.0
  */
@@ -36,36 +37,41 @@ public class EMClustererDatasetTests {
 
     /**
      * The test main
+     *
      * @param args ignored
      */
     public static void main(String[] args) throws Exception {
+        EMClustererDatasetTests emClustererDatasetTests = new EMClustererDatasetTests();
         CSVWriter writer = new CSVWriter("EMNurseryResults.csv", FIELDS);
         writer.open();
         AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readNurseryAttributeLabeledTrainingDataSet();
-        for (int k = 1; k <= 10; k++) {
-            evaluateDataSet(attributeLabeledDataSet, k, 10, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 100, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 500, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 1000, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 2000, writer);
-        }
+        emClustererDatasetTests.runEMTests(writer, attributeLabeledDataSet, 1);
         writer.close();
 
         writer = new CSVWriter("EMLungResults.csv", FIELDS);
         writer.open();
         attributeLabeledDataSet = DataSetUtil.readLungTop101AttributeLabeledTrainingDataSet();
-        for (int k = 1; k <= 10; k++) {
-            evaluateDataSet(attributeLabeledDataSet, k, 10, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 100, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 500, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 1000, writer);
-            evaluateDataSet(attributeLabeledDataSet, k, 2000, writer);
-        }
+        emClustererDatasetTests.runEMTests(writer, attributeLabeledDataSet, 1);
         writer.close();
     }
 
-    public static void evaluateDataSet(AttributeLabeledDataSet attributeLabeledDataSet, int k, int iterations,
-                                       CSVWriter writer) throws IOException {
+    public void runEMTests(CSVWriter writer, AttributeLabeledDataSet attributeLabeledDataSet, int numRuns) throws IOException {
+        for (int k = 1; k <= 10; k++) {
+            evaluateDataSet(attributeLabeledDataSet, k, 10, writer, numRuns);
+            writer.nextRecord();
+            evaluateDataSet(attributeLabeledDataSet, k, 100, writer, numRuns);
+            writer.nextRecord();
+            evaluateDataSet(attributeLabeledDataSet, k, 500, writer, numRuns);
+            writer.nextRecord();
+            evaluateDataSet(attributeLabeledDataSet, k, 1000, writer, numRuns);
+            writer.nextRecord();
+            evaluateDataSet(attributeLabeledDataSet, k, 2000, writer, numRuns);
+            writer.nextRecord();
+        }
+    }
+
+    public void evaluateDataSet(AttributeLabeledDataSet attributeLabeledDataSet, int k, int iterations,
+                                CSVWriter writer, int numRuns) throws IOException {
         System.out.println("\nEvaluating with k = " + k + "; iterations = " + iterations);
         DataSet set = attributeLabeledDataSet.getDataSet();
 
@@ -88,8 +94,8 @@ public class EMClustererDatasetTests {
 
         EMClusterer em;
         List<Integer> sortedAttrClusterVarianceIndexes;
-        double numRuns = 1.0, totalMinDistance = 0.0;
-        double start, totalTime = 0.0, timeDivisor = Math.pow(10,9);
+        double totalMinDistance = 0.0;
+        double start, totalTime = 0.0, timeDivisor = Math.pow(10, 9);
         double totalMinClusterVar = 0.0, totalMaxClusterVar = 0.0, totalAvgClusterVar = 0.0;
 
         for (double i = 0; i < numRuns; i++) {
@@ -101,7 +107,7 @@ public class EMClustererDatasetTests {
             int meanCount = em.getMixture().getComponents().length;
             ArrayList<Vector> means = new ArrayList<Vector>(meanCount);
             for (int j = 0; j < meanCount; j++) {
-                means.add(((MultivariateGaussian)em.getMixture().getComponents()[j]).getMean());
+                means.add(((MultivariateGaussian) em.getMixture().getComponents()[j]).getMean());
             }
 
             System.out.println("\nEM Clusters");
@@ -116,30 +122,29 @@ public class EMClustererDatasetTests {
             totalMaxClusterVar += clusterVariances.get(0);
             totalMinClusterVar += clusterVariances.get(attrVariances.size() - 1);
             totalAvgClusterVar += clusterVariance.sum() / clusterVariance.size();
-            System.out.println("Cluster Var Min: " + totalMinClusterVar / (i+1) + "; Max: " + totalMaxClusterVar / (i+1) + "; Avg: " + totalAvgClusterVar / (i+1));
+            System.out.println("Cluster Var Min: " + totalMinClusterVar / (i + 1) + "; Max: " + totalMaxClusterVar / (i + 1) + "; Avg: " + totalAvgClusterVar / (i + 1));
 
             sortedAttrClusterVarianceIndexes = DataSetUtil.getVectorIndexesSortedByValueDesc(clusterVariance);
             System.out.println(DataSetUtil.indexesToAttributes(sortedAttrClusterVarianceIndexes, attributeLabeledDataSet));
 
             totalMinDistance += DataSetUtil.minDistance(sortedAttrInstanceVarianceIndexes, sortedAttrClusterVarianceIndexes);
-            System.out.println("\nMin distance between sorted indexes\n" + totalMinDistance / (i+1));
+            System.out.println("\nMin distance between sorted indexes\n" + totalMinDistance / (i + 1));
 
             System.out.println(em.toString());
         }
 
         writer.write(Integer.toString(k));
         writer.write(Integer.toString(iterations));
-        writer.write(Double.toString(totalTime / numRuns));
-        writer.write(Double.toString(totalMinDistance / numRuns));
+        writer.write(Double.toString(totalTime / (double)numRuns));
+        writer.write(Double.toString(totalMinDistance / (double)numRuns));
         writer.write(Double.toString(minInstanceVar));
         writer.write(Double.toString(maxInstanceVar));
         writer.write(Double.toString(avgInstanceVar));
-        writer.write(Double.toString(totalMinClusterVar / numRuns));
-        writer.write(Double.toString(totalMaxClusterVar / numRuns));
-        writer.write(Double.toString(totalAvgClusterVar / numRuns));
+        writer.write(Double.toString(totalMinClusterVar / (double)numRuns));
+        writer.write(Double.toString(totalMaxClusterVar / (double)numRuns));
+        writer.write(Double.toString(totalAvgClusterVar / (double)numRuns));
         writer.write("\"" + DataSetUtil.indexesToAttributes(
                 sortedAttrInstanceVarianceIndexes.subList(0, Math.min(sortedAttrInstanceVarianceIndexes.size(), 10)),
                 attributeLabeledDataSet) + "\"");
-        writer.nextRecord();
     }
 }
