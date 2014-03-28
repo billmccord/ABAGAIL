@@ -16,6 +16,7 @@ import java.io.IOException;
 public class RandomProjectionFilterDatasetTests {
 
     private static String[] FIELDS = {
+            "Run Count",
             "Attrs Removed"
     };
 
@@ -87,23 +88,29 @@ public class RandomProjectionFilterDatasetTests {
 
     public void runkMeansTest(CSVWriter writer, AttributeLabeledDataSet attributeLabeledDataSet, int removeAttrs)
             throws IOException {
-        filterSet(attributeLabeledDataSet, removeAttrs);
-        KMeansClustererDatasetTests kMeansClustererDatasetTests = new KMeansClustererDatasetTests();
-        for (int k = 1; k <= 20; k++) {
-            writer.write(Integer.toString(removeAttrs));
-            kMeansClustererDatasetTests.evaluateDataSet(attributeLabeledDataSet, k, writer, 10);
-            writer.nextRecord();
+        for (int i = 0; i < 3; i++) {
+            filterSet(attributeLabeledDataSet, removeAttrs);
+            KMeansClustererDatasetTests kMeansClustererDatasetTests = new KMeansClustererDatasetTests();
+            for (int k = 1; k <= 20; k++) {
+                writer.write(Integer.toString(i));
+                writer.write(Integer.toString(removeAttrs));
+                kMeansClustererDatasetTests.evaluateDataSet(attributeLabeledDataSet, k, writer, 10);
+                writer.nextRecord();
+            }
         }
     }
 
     public void runEMTest(CSVWriter writer, AttributeLabeledDataSet attributeLabeledDataSet, int removeAttrs)
             throws IOException {
-        filterSet(attributeLabeledDataSet, removeAttrs);
-        EMClustererDatasetTests emClustererDatasetTests = new EMClustererDatasetTests();
-        for (int k = 1; k <= 10; k++) {
-            writer.write(Integer.toString(removeAttrs));
-            emClustererDatasetTests.evaluateDataSet(attributeLabeledDataSet, k, 1000, writer, 1);
-            writer.nextRecord();
+        for (int i = 0; i < 3; i++) {
+            filterSet(attributeLabeledDataSet, removeAttrs);
+            EMClustererDatasetTests emClustererDatasetTests = new EMClustererDatasetTests();
+            for (int k = 1; k <= 10; k++) {
+                writer.write(Integer.toString(i));
+                writer.write(Integer.toString(removeAttrs));
+                emClustererDatasetTests.evaluateDataSet(attributeLabeledDataSet, k, 1000, writer, 1);
+                writer.nextRecord();
+            }
         }
     }
 
