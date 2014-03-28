@@ -47,7 +47,7 @@ public class InsignificantComponentAnalysisDatasetTests {
     }
 
     public void runkMeansNurseryTests() throws IOException {
-        CSVWriter writer = new CSVWriter("kMeansICAFilterNurseryResults.csv", K_MEANS_FIELDS);
+        CSVWriter writer = new CSVWriter("kMeansInCAFilterNurseryResults.csv", K_MEANS_FIELDS);
         writer.open();
         for (int i = 0; i < 5; i++) {
             AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readNurseryAttributeLabeledTrainingDataSet();
@@ -57,7 +57,7 @@ public class InsignificantComponentAnalysisDatasetTests {
     }
 
     public void runkMeansLungTests() throws IOException {
-        CSVWriter writer = new CSVWriter("kMeansICAFilterLungResults.csv", K_MEANS_FIELDS);
+        CSVWriter writer = new CSVWriter("kMeansInCAFilterLungResults.csv", K_MEANS_FIELDS);
         writer.open();
         for (int i = 0; i < 100; i += 20) {
             AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readLungTop101AttributeLabeledTrainingDataSet();
@@ -67,7 +67,7 @@ public class InsignificantComponentAnalysisDatasetTests {
     }
 
     public void runEMNurseryTests() throws IOException {
-        CSVWriter writer = new CSVWriter("EMICAFilterNurseryResults.csv", EM_FIELDS);
+        CSVWriter writer = new CSVWriter("EMInCAFilterNurseryResults.csv", EM_FIELDS);
         writer.open();
         for (int i = 0; i < 5; i++) {
             AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readNurseryAttributeLabeledTrainingDataSet();
@@ -76,7 +76,7 @@ public class InsignificantComponentAnalysisDatasetTests {
     }
 
     public void runEMLungTests() throws IOException {
-        CSVWriter writer = new CSVWriter("EMICAFilterLungResults.csv", EM_FIELDS);
+        CSVWriter writer = new CSVWriter("EMInCAFilterLungResults.csv", EM_FIELDS);
         writer.open();
         for (int i = 0; i < 100; i += 20) {
             AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readLungTop101AttributeLabeledTrainingDataSet();
