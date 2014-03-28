@@ -108,9 +108,12 @@ public class IndependentComponentAnalysisDatasetTests {
     }
 
     public void filterSet(AttributeLabeledDataSet attributeLabeledDataSet, int removeAttrs) {
+        double start = System.nanoTime();
         DataSet set = attributeLabeledDataSet.getDataSet();
         IndependentComponentAnalysis filter = new IndependentComponentAnalysis(set,
                 set.getInstances()[0].size() - removeAttrs);
         filter.filter(set);
+        System.out.println("Time to ICA with removal of " + removeAttrs + " attrs: "
+                + (System.nanoTime() - start) / Math.pow(10, 9));
     }
 }

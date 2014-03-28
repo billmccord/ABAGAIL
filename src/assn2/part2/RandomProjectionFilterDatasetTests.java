@@ -108,10 +108,13 @@ public class RandomProjectionFilterDatasetTests {
     }
 
     public void filterSet(AttributeLabeledDataSet attributeLabeledDataSet, int removeAttrs) {
+        double start = System.nanoTime();
         DataSet set = attributeLabeledDataSet.getDataSet();
         RandomizedProjectionFilter filter = new RandomizedProjectionFilter(
                 set.getInstances()[0].size() - removeAttrs,
                 set.getInstances()[0].size());
         filter.filter(set);
+        System.out.println("Time to RP with removal of " + removeAttrs + " attrs: "
+                + (System.nanoTime() - start) / Math.pow(10, 9));
     }
 }

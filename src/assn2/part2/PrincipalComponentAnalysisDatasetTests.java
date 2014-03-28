@@ -108,9 +108,12 @@ public class PrincipalComponentAnalysisDatasetTests {
     }
 
     public void filterSet(AttributeLabeledDataSet attributeLabeledDataSet, int removeAttrs) {
+        double start = System.nanoTime();
         DataSet set = attributeLabeledDataSet.getDataSet();
         PrincipalComponentAnalysis filter = new PrincipalComponentAnalysis(set,
                 set.getInstances()[0].size() - removeAttrs);
         filter.filter(set);
+        System.out.println("Time to PCA with removal of " + removeAttrs + " attrs: "
+                + (System.nanoTime() - start) / Math.pow(10, 9));
     }
 }
