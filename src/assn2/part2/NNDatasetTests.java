@@ -2,13 +2,21 @@ package assn2.part2;
 
 import assn2.util.AttributeLabeledDataSet;
 import assn2.util.DataSetUtil;
+import func.nn.backprop.BackPropagationNetwork;
+import func.nn.backprop.BackPropagationNetworkFactory;
+import func.nn.backprop.BatchBackPropagationTrainer;
+import func.nn.backprop.RPROPUpdateRule;
+import shared.ConvergenceTrainer;
 import shared.DataSet;
-import shared.filt.IndependentComponentAnalysis;
+import shared.Instance;
+import shared.SumOfSquaresError;
+import shared.filt.PrincipalComponentAnalysis;
 import shared.writer.CSVWriter;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 
-public class IndependentComponentAnalysisDatasetTests {
+public class NNDatasetTests {
 
     private static String[] FIELDS = {
             "Attrs Removed"
@@ -34,7 +42,7 @@ public class IndependentComponentAnalysisDatasetTests {
      * @param args ignored
      */
     public static void main(String[] args) throws IOException {
-        IndependentComponentAnalysisDatasetTests tests = new IndependentComponentAnalysisDatasetTests();
+        NNDatasetTests tests = new NNDatasetTests();
         tests.runkMeansNurseryTests();
         tests.runkMeansLungTests();
         tests.runEMNurseryTests();
@@ -42,7 +50,7 @@ public class IndependentComponentAnalysisDatasetTests {
     }
 
     public void runkMeansNurseryTests() throws IOException {
-        CSVWriter writer = new CSVWriter("kMeansICAFilterNurseryResults.csv", K_MEANS_FIELDS);
+        CSVWriter writer = new CSVWriter("kMeansPCAFilterNurseryResults.csv", K_MEANS_FIELDS);
         writer.open();
         for (int i = 0; i < 5; i++) {
             AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readNurseryAttributeLabeledTrainingDataSet();
@@ -52,7 +60,7 @@ public class IndependentComponentAnalysisDatasetTests {
     }
 
     public void runkMeansLungTests() throws IOException {
-        CSVWriter writer = new CSVWriter("kMeansICAFilterLungResults.csv", K_MEANS_FIELDS);
+        CSVWriter writer = new CSVWriter("kMeansPCAFilterLungResults.csv", K_MEANS_FIELDS);
         writer.open();
         for (int i = 0; i < 100; i += 20) {
             AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readLungTop101AttributeLabeledTrainingDataSet();
@@ -62,7 +70,7 @@ public class IndependentComponentAnalysisDatasetTests {
     }
 
     public void runEMNurseryTests() throws IOException {
-        CSVWriter writer = new CSVWriter("EMICAFilterNurseryResults.csv", EM_FIELDS);
+        CSVWriter writer = new CSVWriter("EMPCAFilterNurseryResults.csv", EM_FIELDS);
         writer.open();
         for (int i = 0; i < 5; i++) {
             AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readNurseryAttributeLabeledTrainingDataSet();
@@ -71,7 +79,7 @@ public class IndependentComponentAnalysisDatasetTests {
     }
 
     public void runEMLungTests() throws IOException {
-        CSVWriter writer = new CSVWriter("EMICAFilterLungResults.csv", EM_FIELDS);
+        CSVWriter writer = new CSVWriter("EMPCAFilterLungResults.csv", EM_FIELDS);
         writer.open();
         for (int i = 0; i < 100; i += 20) {
             AttributeLabeledDataSet attributeLabeledDataSet = DataSetUtil.readLungTop101AttributeLabeledTrainingDataSet();
@@ -105,10 +113,69 @@ public class IndependentComponentAnalysisDatasetTests {
     public void filterSet(AttributeLabeledDataSet attributeLabeledDataSet, int removeAttrs) {
         double start = System.nanoTime();
         DataSet set = attributeLabeledDataSet.getDataSet();
-        IndependentComponentAnalysis filter = new IndependentComponentAnalysis(set,
+        PrincipalComponentAnalysis filter = new PrincipalComponentAnalysis(set,
                 set.getInstances()[0].size() - removeAttrs);
         filter.filter(set);
-        System.out.println("Time to ICA with removal of " + removeAttrs + " attrs: "
+        System.out.println("Time to PCA with removal of " + removeAttrs + " attrs: "
                 + (System.nanoTime() - start) / Math.pow(10, 9));
+    }
+
+    private void runNNTrainer(CSVWriter writer, DataSet trainingSet, DataSet testSet) {
+        int outputLayer = 1;
+        int inputLayer = trainingSet.getDescription().getAttributeCount() - 1;
+        int hiddenLayer = Math.round((outputLayer + inputLayer) * 2/3);
+        BackPropagationNetworkFactory factory = new BackPropagationNetworkFactory();
+        BackPropagationNetwork network = factory.createClassificationNetwork(new int[] {inputLayer, hiddenLayer, outputLayer});
+
+        double start = System.nanoTime(), end, trainingTime, testingTime;
+        int correct = 0, incorrect = 0;
+        ConvergenceTrainer trainer = new ConvergenceTrainer(
+                new BatchBackPropagationTrainer(trainingSet, network,
+                        new SumOfSquaresError(), new RPROPUpdateRule()));
+        trainer.train();
+        System.out.println("Convergence in " + trainer.getIterations() + " iterations");
+        end = System.nanoTime();
+        trainingTime = end - start;
+        trainingTime /= Math.pow(10,9);
+
+        double predicted, actual;
+        start = System.nanoTime();
+        for(Instance testInstance : testSet.getInstances()) {
+            network.setInputValues(testInstance.getData());
+            network.run();
+
+            predicted = Double.parseDouble(testInstance.getLabel().toString());
+            actual = Double.parseDouble(network.getOutputValues().toString());
+
+            if (Math.abs(predicted - actual) < 0.5) {
+                correct++;
+            } else {
+                incorrect++;
+            }
+        }
+        end = System.nanoTime();
+        testingTime = end - start;
+        testingTime /= Math.pow(10,9);
+
+        double percentCorrect = (double)correct/ (double)(correct+incorrect)*100.0;
+
+        try {
+            writer.write("BackPropagation");
+            writer.write(Integer.toString(trainer.getIterations()));
+            writer.write(Integer.toString(correct));
+            writer.write(Integer.toString(incorrect));
+            writer.write(Double.toString(percentCorrect));
+            writer.write(Double.toString(trainingTime));
+            writer.nextRecord();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        DecimalFormat df = new DecimalFormat("0.000");
+        String results = "\nResults: \nCorrectly classified " + correct + " trainingInstances." +
+                "\nIncorrectly classified " + incorrect + " trainingInstances.\nPercent correctly classified: "
+                + df.format(percentCorrect) + "%\nTraining time: " + df.format(trainingTime)
+                + " seconds\nTesting time: " + df.format(testingTime) + " seconds\n";
+        System.out.println(results);
     }
 }

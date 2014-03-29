@@ -5,11 +5,6 @@ import shared.Instance;
 import shared.filt.LinearDiscriminantAnalysis;
 import util.linalg.DenseVector;
 
-/**
- * A class for testing
- * @author Andrew Guillory gtg008g@mail.gatech.edu
- * @version 1.0
- */
 public class LinearDiscriminantAnalysisDatasetTests {
     
     /**

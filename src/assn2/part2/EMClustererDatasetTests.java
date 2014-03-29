@@ -4,7 +4,6 @@ import assn2.util.AttributeLabeledDataSet;
 import assn2.util.DataSetUtil;
 import dist.MultivariateGaussian;
 import func.EMClusterer;
-import func.KMeansClusterer;
 import shared.DataSet;
 import shared.writer.CSVWriter;
 import util.linalg.Vector;
@@ -14,12 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Testing
- *
- * @author Andrew Guillory gtg008g@mail.gatech.edu
- * @version 1.0
- */
 public class EMClustererDatasetTests {
     public static final String[] FIELDS = {
             "k",

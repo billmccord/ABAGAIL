@@ -17,13 +17,6 @@ import shared.writer.CSVWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
-/**
- * Implementation of randomized hill climbing, simulated annealing, and genetic algorithm to
- * find optimal weights to a neural network that is classifying a dataset.
- *
- * @author Hannah Lau
- * @version 1.0
- */
 public class NNOptimizationTests {
     private static DataSet trainingSet = DataSetUtil.readNurseryTrainingDataSet();
     private static Instance[] trainingInstances = trainingSet.getInstances();

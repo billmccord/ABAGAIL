@@ -11,11 +11,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Testing
- * @author Andrew Guillory gtg008g@mail.gatech.edu
- * @version 1.0
- */
 public class KMeansClustererDatasetTests {
     public static final String[] FIELDS = {
             "k",

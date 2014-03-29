@@ -8,11 +8,6 @@ import shared.writer.CSVWriter;
 
 import java.io.IOException;
 
-/**
- * A class for testing
- * @author Andrew Guillory gtg008g@mail.gatech.edu
- * @version 1.0
- */
 public class PrincipalComponentAnalysisDatasetTests {
 
     private static String[] FIELDS = {
