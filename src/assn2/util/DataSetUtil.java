@@ -77,7 +77,7 @@ public class DataSetUtil {
         return readAttributeLabeledDataSet(LUNG_TOP_101_ATTR_TRAINING_FILE);
     }
 
-    public static DataSet readLungTop1001AttributeTestDataSet() {
+    public static DataSet readLungTop101AttributeTestDataSet() {
         return readLungTop101AttributeLabeledTestDataSet().getDataSet();
     }
 

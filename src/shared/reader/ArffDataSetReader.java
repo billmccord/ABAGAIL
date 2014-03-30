@@ -70,7 +70,7 @@ public class ArffDataSetReader extends DataSetReader {
 				    //NOTE: for REAL and INTEGER types, this will do nothing but those types are handled
 				    // in processInstances
 					String[] values = parts[2].replaceAll(" |\\{|\\}|'","").split(",");
-                    System.out.println("Attribute " + attributes.size() + " name: " + parts[1] + ", values: " + parts[2]);
+//                    System.out.println("Attribute " + attributes.size() + " name: " + parts[1] + ", values: " + parts[2]);
                     attributeNames.add(parts[1]);
 					double id = 0.0;
 					Map<String, Double> valMap = new HashMap<String, Double>();

@@ -136,6 +136,10 @@ public class MultivariateGaussian extends AbstractDistribution  implements Copya
      * @see dist.Distribution#estimate(shared.DataSet)
      */
     public void estimate(DataSet observations) {
+        estimate(observations, 1);
+    }
+
+    public void estimate(DataSet observations, int count) {
         double weightSum = 0;
         // calculate mean
         mean = new DenseVector(observations.get(0).size());
@@ -157,8 +161,8 @@ public class MultivariateGaussian extends AbstractDistribution  implements Copya
             for (int i = 0; i < covarianceMatrix.m(); i++) {
                 for (int j = 0; j < covarianceMatrix.n(); j++) {
                     covarianceMatrix.set(i,j,
-                        covarianceMatrix.get(i,j) +
-                        dMinusMean.get(i) * dMinusMean.get(j) * weight);
+                            covarianceMatrix.get(i,j) +
+                                    dMinusMean.get(i) * dMinusMean.get(j) * weight);
                 }
             }
         }
@@ -188,8 +192,13 @@ public class MultivariateGaussian extends AbstractDistribution  implements Copya
             } else {
                 floor *= FLOOR_CHANGE;
             }
-            // try again
-            estimate(observations);
+
+            if (count < 20) {
+                // try again
+                estimate(observations, count + 1);
+            } else {
+                throw new RuntimeException("WTF?");
+            }
         }
     }
     

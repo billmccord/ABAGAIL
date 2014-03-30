@@ -1,13 +1,11 @@
 package func;
 
-import shared.DataSet;
-import shared.DistanceMeasure;
-import shared.EuclideanDistance;
-import shared.Instance;
+import shared.*;
 import util.linalg.DenseVector;
 import dist.*;
 import dist.Distribution;
 import dist.DiscreteDistribution;
+import util.linalg.Vector;
 
 /**
  * A K means clusterer
@@ -29,6 +27,8 @@ public class KMeansClusterer extends AbstractConditionalDistribution implements 
      * The distance measure
      */
     private DistanceMeasure distanceMeasure;
+
+    private int[] assignments;
     
     /**
      * Make a new k means clustere
@@ -82,7 +82,7 @@ public class KMeansClusterer extends AbstractConditionalDistribution implements 
      */
     public void estimate(DataSet set) {
         clusterCenters = new Instance[k];
-        int[] assignments = new int[set.size()];
+        assignments = new int[set.size()];
         // random initial centers
         for (int i = 0; i < clusterCenters.length; i++) {
             int pick;
@@ -181,6 +181,24 @@ public class KMeansClusterer extends AbstractConditionalDistribution implements 
      */
     public Instance[] getClusterCenters() {
         return clusterCenters;
+    }
+
+    public void addClusterAsAttribute(DataSet set)
+    {
+        Instance[] instances = set.getInstances();
+        double range = Math.max(1, k - 1);
+        for (int i=0; i<set.size(); i++) {
+            Vector data = instances[i].getData();
+            DenseVector newData = new DenseVector(data.size() + 1);
+            for (int j=0; j<data.size(); j++) {
+                newData.set(j, data.get(j));
+            }
+            // normalize cluster assignment to range of -1 to 1
+            newData.set(data.size(), (double)(assignments[i]) / range * 2.0 - 1.0);
+            instances[i].setData(newData);
+        }
+        // reset the description to reflect the new attributes
+        set.setDescription(new DataSetDescription(set));
     }
 
     /**
